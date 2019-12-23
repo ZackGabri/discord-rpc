@@ -14,21 +14,21 @@
         "enabled": Boolean,
 
         // This will indicate if its gonna be a countdown or a normal timer, the string will either be "countdown" or "normal" just to be clear
-		// and if it was nither of those, it will be defaulted to "normal"
-        "type": String
+	// and if it was nither of those, it will be defaulted to "normal"
+        "type": String,
 
         // The next properties will only be used if its countdown
 
         // how long the countdown is gonna be
-		// this one is required if you want to use a countdown
-        "duration_time": Number
+	// this one is required if you want to use a countdown
+        "duration_time": Number,
 
         // what kind of time is gonna be used
-		// you can use: 
-		// "hours","hour","hor","h",
-		// "minutes","minute","min","m",
-		// "seconds", "second", "sec", "s"
-		// if it was not any of those it will be defaulted to seconds
+	// you can use: 
+	// "hours","hour","hor","h",
+	// "minutes","minute","min","m",
+	// "seconds", "second", "sec", "s"
+	// if it was not any of those it will be defaulted to seconds
         "duration_type": String 
     }
 }
