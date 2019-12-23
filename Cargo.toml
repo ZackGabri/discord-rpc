@@ -1,7 +1,7 @@
 [package]
-name = "my_program"
+name = "discord_rpc"
 version = "0.1.0"
-authors = ["ZackGabri <mrkoko134@gmail.com>"]
+authors = ["ZackGabri <None>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
