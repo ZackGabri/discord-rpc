@@ -59,6 +59,7 @@ fn main() {
         let mut activity = Activity::new().instance(false);
         
         // if "details" is Some/not None we set the details property to it
+        // details is the higher text
         if let Some(details) = settings.get_value("details") {
             activity = activity.details(&details.to_string());
             println!("Set the details to: {}", &details.to_string())
@@ -67,6 +68,7 @@ fn main() {
         }
 
         // doing the same thing for state
+        // State is the lower text
         if let Some(state) = settings.get_value("state") {
             activity = activity.state(&state.to_string());
             println!("Set the state to: {}", &state.to_string())

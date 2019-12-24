@@ -2,13 +2,13 @@
     // this "client_id" property is gonna be the application's ID that this program will use
     "client_id": String,
 
-    // this is gonna be the lower text
+    // this is gonna be the top text
     "details": String,
 
     // This is gonna be the lower text
     "state": String,
 
-    // This object will contain all settings for the timer (which is just 2 properties)
+    // This object will contain all settings for the timer
     "timer": {
         // whether or not to enable the timer
         "enabled": Boolean,
