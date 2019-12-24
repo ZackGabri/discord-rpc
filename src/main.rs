@@ -43,7 +43,9 @@ impl Format for Configuration {
 fn main() {
 
     let mut settings = Settings::new_and_load(Configuration{});
-    
+    settings.save().unwrap();
+
+
     // getting client id of the options, maybe later there will be an option to change this so i will just keep it like that for now
     let client_id = settings.get_value_or("client_id", &"656753180901638144").to_string();
     
@@ -121,6 +123,8 @@ fn main() {
                     None => println!("Timer was enabled but was not able to find a type, please provide a \"type\" property under the \"timer\" object")
                 }
             }
+        } else {
+            println!("No enabled property for the timer was set, skipping timer")
         }
 
         drpc.set_activity(|_| activity).expect("Ooops, couldn't set the activity );");
