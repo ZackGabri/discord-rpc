@@ -52,6 +52,36 @@ fn main() {
     // the client requires the id to be of type u64 so i parsed it into that
     let mut drpc = DiscordRPC::new(client_id.parse::<u64>().unwrap());
 
+    let time_elapsed = extern_time::get_time().sec as u64;
+
+    let time_multiplier = match settings.get_value("timer.duration_type") {
+        Some(value) => {
+            match value.to_string().to_lowercase().as_ref() {
+                "hours"   | "houre"  | "hor" | "h" => 3600,
+                "minutes" | "minute" | "min" | "m" => 60,
+                "seconds" | "second" | "sec" | "s" => 1,
+                _ => {
+                    println!("The entered duration type is invalid, defaulting to seconds");
+                    1
+                }
+            }
+        },
+        None => {
+            println!("You didn't enter a duration type, defaulting to seconds");
+            1
+        }
+    };
+
+    let timer_duration = match settings.get_value("timer.duration_time") {
+        Some(value) => value.to_int().unwrap(),
+        None => {
+            println!("Please enter a duration time");
+            0
+        }
+    };
+
+    let countdown = time_elapsed + (timer_duration * time_multiplier) as u64;
+
     drpc.start();
 
     // using an infinity loop so the activity doesn't reset right away
@@ -88,39 +118,9 @@ fn main() {
             } else {
                 match settings.get_value("timer.type") {
                     Some(timer_type) => {
-                        let time_elapsed = extern_time::get_time().sec as u64;
-
                         if timer_type.to_string() == "normal" {
                             activity = activity.timestamps(|timer| timer.start(time_elapsed));
                         } else if timer_type.to_string() == "countdown" {
-                            let time_multiplier = match settings.get_value("timer.duration_type") {
-                                Some(value) => {
-                                    match value.to_string().to_lowercase().as_ref() {
-                                        "hours"   | "houre"  | "hor" | "h" => 3600,
-                                        "minutes" | "minute" | "min" | "m" => 60,
-                                        "seconds" | "second" | "sec" | "s" => 1,
-                                        _ => {
-                                            println!("The entered duration type is invalid, defaulting to seconds");
-                                            1
-                                        }
-                                    }
-                                },
-                                None => {
-                                    println!("You didn't enter a duration type, defaulting to seconds");
-                                    1
-                                }
-                            };
-
-                            let timer_duration = match settings.get_value("timer.duration_time") {
-                                Some(value) => value.to_int().unwrap(),
-                                None => {
-                                    println!("Please enter a duration time");
-                                    0
-                                }
-                            };
-
-                            let countdown = time_elapsed + (timer_duration * time_multiplier) as u64;
-
                             activity = activity.timestamps(|timer| timer.end(countdown));
                         } else {
                             println!("invalid timer type, defaulted to \"normal\" timer type");
