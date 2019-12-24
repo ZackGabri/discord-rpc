@@ -9,7 +9,7 @@ Well first you need to follow this steps
 * Run the application at least once 
 * Go to your user directory in windows (currently nothing else is supported)
 * You will find a folder named `.discord_rpc` open it and modify the `config.json`
-> You can find a proper example about the config file in `config.example.json` it explains what does each property do. Take a look at it
+> You can find a proper example about the config file in `config.example` it explains what does each property do. Take a look at it
 
 ## Future planes
 I'm planning to add the following to this program:
