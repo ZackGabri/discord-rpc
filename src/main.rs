@@ -74,6 +74,11 @@ fn main() {
             println!("No state property has been provided, skipped it");
         }
 
+        // adding a check if there is no timer object at all
+        if let None = settings.get_value("timer") {
+            println!("No \"timer\" object was added")
+        }
+
         // managing timer reading
         if let Some(enabled) = settings.get_value("timer.enabled") {
             if !enabled.to_switch().unwrap() {
