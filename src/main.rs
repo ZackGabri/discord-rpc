@@ -6,7 +6,7 @@ use std::{ thread, time };
 
 use rpc::Client as DiscordRPC;
 
-use rpc::models::{ Activity, ActivityAssets };
+use rpc::models::{ Activity };
 use settingsfile::{ Settings, SupportedType, SettingsRaw, Format };
 
 #[derive(Clone)]
