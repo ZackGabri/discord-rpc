@@ -6,7 +6,7 @@ use std::{ thread, time };
 
 use rpc::Client as DiscordRPC;
 
-use rpc::models::Activity;
+use rpc::models::{ Activity, ActivityAssets };
 use settingsfile::{ Settings, SupportedType, SettingsRaw, Format };
 
 #[derive(Clone)]
@@ -43,7 +43,6 @@ impl Format for Configuration {
 fn main() {
 
     let mut settings = Settings::new_and_load(Configuration{});
-    settings.save().unwrap();
 
 
     // getting client id of the options, maybe later there will be an option to change this so i will just keep it like that for now
@@ -86,7 +85,7 @@ fn main() {
 
     // using an infinity loop so the activity doesn't reset right away
     loop {
-        let mut activity = Activity::new().instance(false);
+        let mut activity = Activity::new();
         
         // if "details" is Some/not None we set the details property to it
         // details is the higher text

@@ -30,17 +30,5 @@
 	// "seconds", "second", "sec", "s"
 	// if it was not any of those it will be defaulted to seconds
         "duration_type": String 
-    },
-
-    // this 2 object will include info about the big/small image 
-    // the "path" property should be the full path to the image
-    // the "text" property should be the hover text for that image
-    "big_image": {
-        "path": String,
-        "text": String
-    },
-    "small_image": {
-        "path": String,
-        "text": String
     }
 }
