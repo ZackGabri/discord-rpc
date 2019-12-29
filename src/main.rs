@@ -85,7 +85,7 @@ fn main() {
 
     // using an infinity loop so the activity doesn't reset right away
     loop {
-        let mut activity = Activity::new();
+        let mut activity = Activity::new().assets(|asset| asset.large_image("large_image").large_text("Creator: ZackGabri#7771"));
         
         // if "details" is Some/not None we set the details property to it
         // details is the higher text
