@@ -6,7 +6,7 @@ extern crate serde_json as json;
 use std::{ thread, time, process };
 
 use iui::prelude::*;
-use iui::controls::{ Button, Checkbox, VerticalBox, Group, Combobox };
+use iui::controls::{ Button, Checkbox, VerticalBox, Group, Combobox, Entry, Label };
 
 use rpc::Client as DiscordRPC;
 use rpc::models::{ Activity };
@@ -47,10 +47,29 @@ fn main() {
     let mut win = Window::new(&ui, "Discord RPC", 150, 500, WindowType::NoMenubar);
     let mut vbox = VerticalBox::new(&ui);
 
+    // defining "state" (lower text) and "details" (higher text) controls
+    let mut text_vbox = VerticalBox::new(&ui);
+    let mut text_group = Group::new(&ui, "Text");
+    let mut state_entry = Entry::new(&ui);
+    let mut details_entry = Entry::new(&ui);
+    let details_label = Label::new(&ui, &"Higher text:");
+    let state_label = Label::new(&ui, &"Lower text:");
+    
+    // handling the "state" control
+    state_entry.set_value(&ui, &settings.get_value_or("state", "This is the lower text!").to_string());
+    state_entry.on_changed(&ui, |entry| {
+        settings.set_value("state", &entry).unwrap();
+    });
+
+    // handling the "details" control, its pretty much the same as the "state" control
+    details_entry.set_value(&ui, &settings.get_value_or("details", "This is the higher text!").to_string());
+    details_entry.on_changed(&ui, |entry| {
+        settings.set_value("details", &entry).unwrap();
+    });
+
     // defining timer controls
     let mut timer_vbox = VerticalBox::new(&ui);
     let mut timer_group = Group::new(&ui, "Timer");
-    //let mut timer_countdown_vbox = VerticalBox::new(&ui);
     let mut timer_countdown_group = Group::new(&ui, "Countdown Options");
 
     // making a combobox for the timer type to decide if its going to be normal or a countdown
@@ -205,6 +224,15 @@ fn main() {
             };
         });
     });
+
+    text_vbox.append(&ui, details_label, LayoutStrategy::Compact);
+    text_vbox.append(&ui, details_entry, LayoutStrategy::Compact);
+
+    text_vbox.append(&ui, state_label, LayoutStrategy::Compact);
+    text_vbox.append(&ui, state_entry, LayoutStrategy::Compact);
+
+    text_group.set_child(&ui, text_vbox);
+    vbox.append(&ui, text_group, LayoutStrategy::Compact);
 
     timer_vbox.append(&ui, timer_check, LayoutStrategy::Compact);
     timer_vbox.append(&ui, timer_type, LayoutStrategy::Compact);
