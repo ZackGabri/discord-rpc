@@ -13,9 +13,7 @@ serde_json = "^1.0"
 failure = "^0.1"
 serde = "^1.0"
 time = "^0.1"
-
-# its not the time for the UI yet, so i commented the iui crate, i finally decided what crate i will use for GUI tho
-#iui = "0.3"
+iui = "^0.3"
 
 # "windres" allows me to build the code with a Windows Resources file, currently i'm only using it for an icon
 # currently i dont need windres so i commented it, once i get a proper icon for the program i will uncomment it
