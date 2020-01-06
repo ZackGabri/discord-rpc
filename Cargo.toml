@@ -1,6 +1,6 @@
 [package]
 name = "discord_rpc"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["ZackGabri <None>"]
 edition = "2018"
 
@@ -15,7 +15,6 @@ serde = "^1.0"
 time = "^0.1"
 iui = "^0.3"
 
-# "windres" allows me to build the code with a Windows Resources file, currently i'm only using it for an icon
-# currently i dont need windres so i commented it, once i get a proper icon for the program i will uncomment it
-#[target.'cfg(windows)'.build-dependencies]
-#windres = "0.2"
+
+[target.'cfg(windows)'.build-dependencies]
+windres = "0.2"

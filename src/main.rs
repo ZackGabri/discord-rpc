@@ -58,22 +58,34 @@ fn main() {
     // handling the "state" control
     state_entry.set_value(&ui, &settings.get_value_or("state", "This is the lower text!").to_string());
     state_entry.on_changed(&ui, |entry| {
+        if entry.trim().is_empty() || entry.trim().len() < 2 {
+            return;
+        }
         settings.set_value("state", &entry).unwrap();
     });
 
     // handling the "details" control, its pretty much the same as the "state" control
     details_entry.set_value(&ui, &settings.get_value_or("details", "This is the higher text!").to_string());
     details_entry.on_changed(&ui, |entry| {
+        if entry.trim().is_empty() || entry.trim().len() < 2 {
+            println!("2");
+            return;
+        }
         settings.set_value("details", &entry).unwrap();
     });
 
     // defining timer controls
     let mut timer_vbox = VerticalBox::new(&ui);
     let mut timer_group = Group::new(&ui, "Timer");
+    // allow the unused mutable because we're gonna need it later
+    #[allow(unused_mut)]
     let mut timer_countdown_group = Group::new(&ui, "Countdown Options");
 
     // making a combobox for the timer type to decide if its going to be normal or a countdown
     let mut timer_type = Combobox::new(&ui);
+    let timer_label = Label::new(&ui, "Timer type:");
+    let empty_timer_label = Label::new(&ui, "");
+
     timer_type.append(&ui, "Normal");
     timer_type.append(&ui, "Countdown");
     timer_type.set_selected(&ui, match &*settings.get_value_or("timer.type", "normal").to_string() {
@@ -84,11 +96,9 @@ fn main() {
     timer_type.on_selected(&ui, |value| {
         match value {
             206158430208 => {
-                timer_countdown_group.hide(&ui);
                 settings.set_value("timer.type", "normal").unwrap();
             },
             206158430209 => {
-                timer_countdown_group.show(&ui);
                 settings.set_value("timer.type", "countdown").unwrap();
             },
             _ => settings.set_value("timer.type", "normal").unwrap()
@@ -166,7 +176,7 @@ fn main() {
             drpc.start();
 			
             loop {
-                let mut activity = Activity::new().assets(|asset| asset.large_image("large_image").large_text("Creator: ZackGabri#7771"));
+                let mut activity = Activity::new().assets(|asset| asset.large_image("large_image"));
             
                 // if "details" is Some/not None we set the details property to it
                 // details is the higher text
@@ -225,6 +235,7 @@ fn main() {
         });
     });
 
+    // add the "details" and the "state" controls to the ui
     text_vbox.append(&ui, details_label, LayoutStrategy::Compact);
     text_vbox.append(&ui, details_entry, LayoutStrategy::Compact);
 
@@ -234,9 +245,13 @@ fn main() {
     text_group.set_child(&ui, text_vbox);
     vbox.append(&ui, text_group, LayoutStrategy::Compact);
 
+    // add the timer controls to the ui
     timer_vbox.append(&ui, timer_check, LayoutStrategy::Compact);
+    timer_vbox.append(&ui, empty_timer_label, LayoutStrategy::Compact);
+    timer_vbox.append(&ui, timer_label, LayoutStrategy::Compact);
     timer_vbox.append(&ui, timer_type, LayoutStrategy::Compact);
-    timer_vbox.append(&ui, timer_countdown_group, LayoutStrategy::Compact);
+    timer_vbox.append(&ui, timer_countdown_group.clone(), LayoutStrategy::Compact);
+
     timer_group.set_child(&ui, timer_vbox);
     vbox.append(&ui, timer_group, LayoutStrategy::Compact);
 
