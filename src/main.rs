@@ -250,7 +250,7 @@ fn main() {
     timer_vbox.append(&ui, empty_timer_label, LayoutStrategy::Compact);
     timer_vbox.append(&ui, timer_label, LayoutStrategy::Compact);
     timer_vbox.append(&ui, timer_type, LayoutStrategy::Compact);
-    timer_vbox.append(&ui, timer_countdown_group.clone(), LayoutStrategy::Compact);
+    timer_vbox.append(&ui, timer_countdown_group, LayoutStrategy::Compact);
 
     timer_group.set_child(&ui, timer_vbox);
     vbox.append(&ui, timer_group, LayoutStrategy::Compact);
