@@ -68,7 +68,6 @@ fn main() {
     details_entry.set_value(&ui, &settings.get_value_or("details", "This is the higher text!").to_string());
     details_entry.on_changed(&ui, |entry| {
         if entry.trim().is_empty() || entry.trim().len() < 2 {
-            println!("2");
             return;
         }
         settings.set_value("details", &entry).unwrap();
