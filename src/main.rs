@@ -188,6 +188,18 @@ fn main() {
                 None => 0
             };
 
+            if ((time_hours / 3600) == 24) || ((time_hours / 3600) == 23 && (time_seconds > 59 && (time_minutes / 60) > 59)) {
+                println!("hi");
+                time_hours = 23 * 3600; time_minutes = 59 * 60; time_seconds = 59;
+
+                settings.set_value("timer.duration_h", &23).unwrap();
+                settings.set_value("timer.duration_m", &59).unwrap();
+                settings.set_value("timer.duration_s", &59).unwrap();
+
+                settings.save().unwrap();
+                settings.load().unwrap();
+            }
+
             let countdown = time_elapsed + (time_hours + time_minutes + time_seconds) as u64;
             
             drpc.start();
