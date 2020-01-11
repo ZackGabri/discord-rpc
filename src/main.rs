@@ -189,7 +189,6 @@ fn main() {
             };
 
             if ((time_hours / 3600) == 24) || ((time_hours / 3600) == 23 && (time_seconds > 59 && (time_minutes / 60) > 59)) {
-                println!("hi");
                 time_hours = 23 * 3600; time_minutes = 59 * 60; time_seconds = 59;
 
                 settings.set_value("timer.duration_h", &23).unwrap();
