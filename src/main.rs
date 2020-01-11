@@ -6,7 +6,7 @@ extern crate serde_json as json;
 use std::{ thread, time, process };
 
 use iui::prelude::*;
-use iui::controls::{ Button, Checkbox, VerticalBox, Group, Combobox, Entry, Label };
+use iui::controls::{ Button, Checkbox, VerticalBox, Group, Combobox, Entry, Label, Spinbox };
 
 use rpc::Client as DiscordRPC;
 use rpc::models::{ Activity };
@@ -78,7 +78,38 @@ fn main() {
     let mut timer_group = Group::new(&ui, "Timer");
     // allow the unused mutable because we're gonna need it later
     #[allow(unused_mut)]
-    let mut timer_countdown_group = Group::new(&ui, "Countdown Options");
+    let mut countdown_vbox = VerticalBox::new(&ui);
+    let mut countdown_group = Group::new(&ui, "Countdown Options");
+    let mut hours_spinbox = Spinbox::new(&ui, 24, 0);
+    let mut minutes_spinbox = Spinbox::new(&ui, 60, 0);
+    let mut seconds_spinbox = Spinbox::new(&ui, 60, 0);
+    let hours_label = Label::new(&ui, "Hours:");
+    let minutes_label = Label::new(&ui, "Minutes:");
+    let seconds_label = Label::new(&ui, "Seconds:");
+
+    hours_spinbox.set_value(&ui, match settings.get_value_or("timer.duration_h", "0").to_int() {
+        Some(v) => v as i64,
+        None => 0
+    });
+    minutes_spinbox.set_value(&ui, match settings.get_value_or("timer.duration_m", "0").to_int() {
+        Some(v) => v as i64,
+        None => 0
+    });
+    seconds_spinbox.set_value(&ui, match settings.get_value_or("timer.duration_s", "0").to_int() {
+        Some(v) => v as i64,
+        None => 0
+    });
+    hours_spinbox.on_changed(&ui, |val| {
+        settings.set_value("timer.duration_h", &(val as i32)).unwrap();
+    });
+
+    minutes_spinbox.on_changed(&ui, |val| {
+        settings.set_value("timer.duration_m", &(val as i32)).unwrap();
+    });
+
+    seconds_spinbox.on_changed(&ui, |val| {
+        settings.set_value("timer.duration_s", &(val as i32)).unwrap();
+    });
 
     // making a combobox for the timer type to decide if its going to be normal or a countdown
     let mut timer_type = Combobox::new(&ui);
@@ -144,36 +175,23 @@ fn main() {
             let mut drpc = DiscordRPC::new(client_id.parse::<u64>().unwrap());
     
             let time_elapsed = extern_time::get_time().sec as u64;
-            let time_multiplier = match settings.get_value("timer.duration_type") {
-                Some(value) => {
-                    match value.to_string().to_lowercase().as_ref() {
-                        "hours"   | "houre"  | "hor" | "h" => 3600,
-                        "minutes" | "minute" | "min" | "m" => 60,
-                        "seconds" | "second" | "sec" | "s" => 1,
-                        _ => {
-                            println!("The entered duration type is invalid, defaulting to seconds");
-                            1
-                        }
-                    }
-                },
-                None => {
-                    println!("You didn't enter a duration type, defaulting to seconds");
-                    1
-                }
+            let mut time_hours = match settings.get_value("timer.duration_h") {
+                Some(value) => value.to_int().unwrap() * 3600,
+                None => 0
             };
-
-            let timer_duration = match settings.get_value("timer.duration_time") {
+            let mut time_minutes = match settings.get_value("timer.duration_m") {
+                Some(value) => value.to_int().unwrap() * 60,
+                None => 0
+            };
+            let mut time_seconds = match settings.get_value("timer.duration_s") {
                 Some(value) => value.to_int().unwrap(),
-                None => {
-                    println!("Please enter a duration time");
-                    0
-                }
+                None => 0
             };
 
-            let countdown = time_elapsed + (timer_duration * time_multiplier) as u64;
+            let countdown = time_elapsed + (time_hours + time_minutes + time_seconds) as u64;
             
             drpc.start();
-			
+			settings.save().unwrap();
             loop {
                 let mut activity = Activity::new().assets(|asset| asset.large_image("large_image"));
             
@@ -249,7 +267,18 @@ fn main() {
     timer_vbox.append(&ui, empty_timer_label, LayoutStrategy::Compact);
     timer_vbox.append(&ui, timer_label, LayoutStrategy::Compact);
     timer_vbox.append(&ui, timer_type, LayoutStrategy::Compact);
-    timer_vbox.append(&ui, timer_countdown_group, LayoutStrategy::Compact);
+    // timer countdown
+    countdown_vbox.append(&ui, hours_label, LayoutStrategy::Compact);
+    countdown_vbox.append(&ui, hours_spinbox, LayoutStrategy::Compact);
+
+    countdown_vbox.append(&ui, minutes_label, LayoutStrategy::Compact);
+    countdown_vbox.append(&ui, minutes_spinbox, LayoutStrategy::Compact);
+
+    countdown_vbox.append(&ui, seconds_label, LayoutStrategy::Compact);
+    countdown_vbox.append(&ui, seconds_spinbox, LayoutStrategy::Compact);
+
+    countdown_group.set_child(&ui, countdown_vbox);
+    timer_vbox.append(&ui, countdown_group, LayoutStrategy::Compact);
 
     timer_group.set_child(&ui, timer_vbox);
     vbox.append(&ui, timer_group, LayoutStrategy::Compact);
