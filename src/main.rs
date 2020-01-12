@@ -76,8 +76,6 @@ fn main() {
     // defining timer controls
     let mut timer_vbox = VerticalBox::new(&ui);
     let mut timer_group = Group::new(&ui, "Timer");
-    // allow the unused mutable because we're gonna need it later
-    #[allow(unused_mut)]
     let mut countdown_vbox = VerticalBox::new(&ui);
     let mut countdown_group = Group::new(&ui, "Countdown Options");
     let mut hours_spinbox = Spinbox::new(&ui, 24, 0);

@@ -3,3 +3,5 @@
 /Cargo.lock
 /*.txt
 /*.bashrc
+.cargo/
+changelog
