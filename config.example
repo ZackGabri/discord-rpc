@@ -18,17 +18,14 @@
         "type": String,
 
         // The next properties will only be used if its countdown
+        
+        // the next "duration_*" properties indicates how long the countdown should be 
 
-        // how long the countdown is gonna be
-	// this one is required if you want to use a countdown
-        "duration_time": Number,
+        // hours can't be more than 24
+        "duration_h": Number,
 
-        // what kind of time is gonna be used
-	// you can use: 
-	// "hours","hour","hor","h",
-	// "minutes","minute","min","m",
-	// "seconds", "second", "sec", "s"
-	// if it was not any of those it will be defaulted to seconds
-        "duration_type": String 
+        // minutes and seconds can't be more than 59
+        "duration_m": Number,
+        "duration_s": Number
     }
 }

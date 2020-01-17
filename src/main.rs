@@ -31,7 +31,7 @@ impl Format for Configuration {
 
     fn to_string<T:Sized>(&self,object:&T) -> Result<String,Error>
         where T : SupportedType + serde::ser::Serialize, {
-        let result : Result<String,json::Error> = json::ser::to_string(object);
+        let result : Result<String,json::Error> = json::ser::to_string_pretty(object);
 
         match result {
             Ok(result) => Ok(result),
@@ -59,6 +59,9 @@ fn main() {
     state_entry.set_value(&ui, &settings.get_value_or("state", "This is the lower text!").to_string());
     state_entry.on_changed(&ui, |entry| {
         if entry.trim().is_empty() || entry.trim().len() < 2 {
+            if let Some(_v) = settings.get_value("state") {
+                settings.delete_key("state").unwrap();
+            };
             return;
         }
         settings.set_value("state", &entry).unwrap();
@@ -68,6 +71,9 @@ fn main() {
     details_entry.set_value(&ui, &settings.get_value_or("details", "This is the higher text!").to_string());
     details_entry.on_changed(&ui, |entry| {
         if entry.trim().is_empty() || entry.trim().len() < 2 {
+            if let Some(_v) = settings.get_value("details") {
+                settings.delete_key("details").unwrap();
+            };
             return;
         }
         settings.set_value("details", &entry).unwrap();
@@ -188,13 +194,6 @@ fn main() {
 
             if ((time_hours / 3600) == 24) || ((time_hours / 3600) == 23 && (time_seconds > 59 && (time_minutes / 60) > 59)) {
                 time_hours = 23 * 3600; time_minutes = 59 * 60; time_seconds = 59;
-
-                settings.set_value("timer.duration_h", &23).unwrap();
-                settings.set_value("timer.duration_m", &59).unwrap();
-                settings.set_value("timer.duration_s", &59).unwrap();
-
-                settings.save().unwrap();
-                settings.load().unwrap();
             }
 
             let countdown = time_elapsed + (time_hours + time_minutes + time_seconds) as u64;
