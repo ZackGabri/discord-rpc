@@ -11,7 +11,7 @@ use iui::controls::{ Button, Checkbox, VerticalBox, Group, Combobox, Entry, Labe
 use rpc::Client as DiscordRPC;
 use rpc::models::{ Activity };
 
-use settingsfile::{ Settings, SupportedType, SettingsRaw, Format };
+use settingsfile::{ Settings, SupportedType, SettingsRaw, Format, Type };
 
 #[derive(Clone)]
 struct Configuration { }
@@ -41,7 +41,7 @@ impl Format for Configuration {
 }
 
 fn main() {
-    // defining required variables for the ui
+    // defining the ui
     let mut settings = Settings::new_and_load(Configuration{});
     let ui = UI::init().expect("Couldn't initialize UI library");
     let mut win = Window::new(&ui, "Discord RPC", 150, 500, WindowType::NoMenubar);
@@ -91,50 +91,36 @@ fn main() {
     let minutes_label = Label::new(&ui, "Minutes:");
     let seconds_label = Label::new(&ui, "Seconds:");
 
-    hours_spinbox.set_value(&ui, match settings.get_value_or("timer.duration_h", "0").to_int() {
-        Some(v) => v as i64,
-        None => 0
-    });
-    minutes_spinbox.set_value(&ui, match settings.get_value_or("timer.duration_m", "0").to_int() {
-        Some(v) => v as i64,
-        None => 0
-    });
-    seconds_spinbox.set_value(&ui, match settings.get_value_or("timer.duration_s", "0").to_int() {
-        Some(v) => v as i64,
-        None => 0
-    });
-    hours_spinbox.on_changed(&ui, |val| {
-        settings.set_value("timer.duration_h", &(val as i32)).unwrap();
-    });
+    // setting the default values for the spinboxes
+    hours_spinbox.set_value(&ui, settings.get_value_or("timer.duration_h", "0").to_int().unwrap_or(0) as i64);
+    minutes_spinbox.set_value(&ui, settings.get_value_or("timer.duration_m", "0").to_int().unwrap_or(0) as i64);
+    seconds_spinbox.set_value(&ui, settings.get_value_or("timer.duration_s", "0").to_int().unwrap_or(0) as i64);
 
-    minutes_spinbox.on_changed(&ui, |val| {
-        settings.set_value("timer.duration_m", &(val as i32)).unwrap();
-    });
-
-    seconds_spinbox.on_changed(&ui, |val| {
-        settings.set_value("timer.duration_s", &(val as i32)).unwrap();
-    });
+    // saving the new value of one of the spinboxes value got changed
+    hours_spinbox.on_changed(&ui, |val| settings.set_value("timer.duration_h", &(val as i32)).unwrap());
+    minutes_spinbox.on_changed(&ui, |val| settings.set_value("timer.duration_m", &(val as i32)).unwrap());
+    seconds_spinbox.on_changed(&ui, |val| settings.set_value("timer.duration_s", &(val as i32)).unwrap());
 
     // making a combobox for the timer type to decide if its going to be normal or a countdown
     let mut timer_type = Combobox::new(&ui);
     let timer_label = Label::new(&ui, "Timer type:");
     let empty_timer_label = Label::new(&ui, "");
 
+    // adding the options "Normal" and "Countdown" to the Combobox (Drop list) 
     timer_type.append(&ui, "Normal");
     timer_type.append(&ui, "Countdown");
+
     timer_type.set_selected(&ui, match &*settings.get_value_or("timer.type", "normal").to_string() {
         "normal" => 206158430208,
         "countdown" => 206158430209,
         _ => 206158430208
     });
+
+    // saving the new option when the Combobox (Drop list) value gets changed
     timer_type.on_selected(&ui, |value| {
         match value {
-            206158430208 => {
-                settings.set_value("timer.type", "normal").unwrap();
-            },
-            206158430209 => {
-                settings.set_value("timer.type", "countdown").unwrap();
-            },
+            206158430208 => settings.set_value("timer.type", "normal").unwrap(),
+            206158430209 => settings.set_value("timer.type", "countdown").unwrap(),
             _ => settings.set_value("timer.type", "normal").unwrap()
         }
     });
@@ -142,14 +128,7 @@ fn main() {
     // checking if the timer should be enabled or not
     let mut timer_check = Checkbox::new(&ui, "Enable the timer");
     timer_check.set_checked(&ui, settings.get_value_or("timer.enabled", &false).to_switch().unwrap());
-    timer_check.on_toggled(&ui, |checked| {
-        settings.set_value("timer.enabled", &checked).unwrap();
-        if !checked {
-            // timer_type.hide(&ui);
-        } else {
-            // timer_type.show(&ui);
-        }
-    });
+    timer_check.on_toggled(&ui, |checked| settings.set_value("timer.enabled", &checked).unwrap());
 
     let mut start_button = Button::new(&ui, "Start the activity!");
     let mut start_button_clicked = false;
@@ -179,18 +158,9 @@ fn main() {
             let mut drpc = DiscordRPC::new(client_id.parse::<u64>().unwrap());
     
             let time_elapsed = extern_time::get_time().sec as u64;
-            let mut time_hours = match settings.get_value("timer.duration_h") {
-                Some(value) => value.to_int().unwrap() * 3600,
-                None => 0
-            };
-            let mut time_minutes = match settings.get_value("timer.duration_m") {
-                Some(value) => value.to_int().unwrap() * 60,
-                None => 0
-            };
-            let mut time_seconds = match settings.get_value("timer.duration_s") {
-                Some(value) => value.to_int().unwrap(),
-                None => 0
-            };
+            let mut time_hours = settings.get_value("timer.duration_h").unwrap_or(Type::Int(0)).to_int().expect("\"timer.duration_h\" was not a number");
+            let mut time_minutes = settings.get_value("timer.duration_m").unwrap_or(Type::Int(0)).to_int().expect("\"timer.duration_m\" was not a number");
+            let mut time_seconds = settings.get_value("timer.duration_s").unwrap_or(Type::Int(0)).to_int().expect("\"timer.duration_s\" was not a number");
 
             if ((time_hours / 3600) == 24) || ((time_hours / 3600) == 23 && (time_seconds > 59 && (time_minutes / 60) > 59)) {
                 time_hours = 23 * 3600; time_minutes = 59 * 60; time_seconds = 59;
@@ -199,7 +169,7 @@ fn main() {
             let countdown = time_elapsed + (time_hours + time_minutes + time_seconds) as u64;
             
             drpc.start();
-			settings.save().unwrap();
+			settings.save().expect("An error happened when saving the settings");
             loop {
                 let mut activity = Activity::new().assets(|asset| asset.large_image("large_image"));
             
