@@ -11,4 +11,5 @@ Changed:
 
 Fixed:
 
-* Fixed a bug where lower/higher text doesn't get removed if you empty the text boxes
+* lower/higher text doesn't get removed if you empty the text boxes
+* countdown timer was not set properly

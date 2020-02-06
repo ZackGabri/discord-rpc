@@ -23,20 +23,14 @@ impl Format for Configuration {
         where T : Format + Clone {
         let result : Result<SettingsRaw,json::Error> = json::de::from_str(&buffer);
         
-        match result {
-            Ok(result) => Ok(result),
-            Err(error) => Err(format_err!("{}",error)),
-        }
+        result.map_err(|e| format_err!("{}", e))
     }
 
     fn to_string<T:Sized>(&self,object:&T) -> Result<String,Error>
         where T : SupportedType + serde::ser::Serialize, {
         let result : Result<String,json::Error> = json::ser::to_string_pretty(object);
 
-        match result {
-            Ok(result) => Ok(result),
-            Err(error) => Err(format_err!("{}",error)),
-        }
+        result.map_err(|e| format_err!("{}", e))
     }
 }
 
@@ -59,7 +53,7 @@ fn main() {
     state_entry.set_value(&ui, &settings.get_value_or("state", "This is the lower text!").to_string());
     state_entry.on_changed(&ui, |entry| {
         if entry.trim().is_empty() || entry.trim().len() < 2 {
-            if let Some(_v) = settings.get_value("state") {
+            if settings.get_value("state").is_some() {
                 settings.delete_key("state").unwrap();
             };
             return;
@@ -71,7 +65,7 @@ fn main() {
     details_entry.set_value(&ui, &settings.get_value_or("details", "This is the higher text!").to_string());
     details_entry.on_changed(&ui, |entry| {
         if entry.trim().is_empty() || entry.trim().len() < 2 {
-            if let Some(_v) = settings.get_value("details") {
+            if settings.get_value("details").is_some() {
                 settings.delete_key("details").unwrap();
             };
             return;
@@ -162,11 +156,12 @@ fn main() {
             let mut time_minutes = settings.get_value("timer.duration_m").unwrap_or(Type::Int(0)).to_int().expect("\"timer.duration_m\" was not a number");
             let mut time_seconds = settings.get_value("timer.duration_s").unwrap_or(Type::Int(0)).to_int().expect("\"timer.duration_s\" was not a number");
 
-            if ((time_hours / 3600) == 24) || ((time_hours / 3600) == 23 && (time_seconds > 59 && (time_minutes / 60) > 59)) {
-                time_hours = 23 * 3600; time_minutes = 59 * 60; time_seconds = 59;
+            // add a check if the timer exceed 24 hours, and if so we make it 24 hours, 59 minutes and 59 seconds to prevent discord from starting the timer from 00:00:00
+            if time_hours == 24 || time_hours == 23 && (time_seconds > 59 && time_minutes > 59) {
+                time_hours = 23; time_minutes = 59; time_seconds = 59;
             }
 
-            let countdown = time_elapsed + (time_hours + time_minutes + time_seconds) as u64;
+            let countdown = time_elapsed + ((time_hours * 3600) + (time_minutes * 60) + time_seconds) as u64;
             
             drpc.start();
 			settings.save().expect("An error happened when saving the settings");
