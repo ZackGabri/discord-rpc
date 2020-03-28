@@ -1,7 +1,8 @@
-extern crate windres;
-
-use windres::Build;
+#[cfg(windows)] extern crate windres;
 
 fn main() {
-    Build::new().compile("resources.rc").unwrap();
+	#[cfg(windows)] {
+		use windres::Build;
+		Build::new().compile("resources.rc").unwrap();
+	}
 }
