@@ -1,5 +1,7 @@
 # Discord RPC
 
+Please note that this project is just a pet project, i started it to learn more about the Rust programming language 
+
 This program will allow you to customize the Discord Rich Presence as you wish!,
 its still in the early stages so if you encounter any issues please feel free to open an issue or even a pull request!
 
@@ -15,9 +17,11 @@ Well first you need to follow this steps
 
 ## Future planes
 
-I'm planning to add the following to this program:
+currently development for this project is idle at the moment
+but when i come back to it later i'm willing to add the following:
 
-* make everything customizable
-* add a UI so configuring the settings will be much easier for users
+* a complete re-write of the User Interface.
+* add the ability to change the assets
+* make it optional to use the default discord application
 
-> and actually i got nothing else to do right now, when i get more ideas i will be adding them here
+> if you find yourself upon this project and got some ideas or want to fix a bug in the codes feel free to open an issue/pull request!
